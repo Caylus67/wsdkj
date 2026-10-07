@@ -1,0 +1,40 @@
+import sqlite3
+
+# Create in-memory database
+conn = sqlite3.connect(":memory:")
+cur = conn.cursor()
+
+# Create table with constraints
+cur.execute("""
+CREATE TABLE players(
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    age INTEGER DEFAULT 18,
+    team TEXT
+)
+""")
+
+print("✅ Table created with NOT NULL and DEFAULT constraints")
+
+# Insert valid record
+cur.execute("INSERT INTO players(name, age, team) VALUES('Alice', 20, 'Red')")
+
+# Insert record without age (DEFAULT will apply)
+cur.execute("INSERT INTO players(name, team) VALUES('Bob', 'Blue')")
+
+# Try inserting NULL into NOT NULL column (will raise error)
+try:
+    cur.execute("INSERT INTO players(name, age, team) VALUES(NULL, 25, 'Green')")
+except Exception as e:
+    print("❌ Error inserting NULL into name:", e)
+
+# Try inserting record without name (NOT NULL violation)
+try:
+    cur.execute("INSERT INTO players(age, team) VALUES(22, 'Yellow')")
+except Exception as e:
+    print("❌ Error inserting missing name:", e)
+
+# Show all records
+print("\n📋 Current player records:")
+for row in cur.execute("SELECT * FROM players"):
+    print(row)i
